@@ -159,6 +159,7 @@ const upload = multer({
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('trust proxy', 1);
 app.use(compression());
 // Immutable assets (hashed filenames) get 1-year cache; everything else 1 day
 app.use('/css', express.static(path.join(__dirname, 'public', 'css'), { maxAge: '7d' }));
