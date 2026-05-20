@@ -326,6 +326,14 @@ img {
   border-radius: 12px;
 }
 
+/* ─── Logo images — no rounding ─────────────── */
+.nav-logo-dark,
+.nav-logo-white,
+img[src*="rysen-logo"],
+img[src*="rysen-favicon"] {
+  border-radius: 0 !important;
+}
+
 /* ─── Warm card hover shadow ─────────────────── */
 .hover\:shadow-md:hover {
   box-shadow: 0 8px 30px rgba(249, 115, 22, 0.08), 0 2px 8px rgba(0,0,0,0.06);
