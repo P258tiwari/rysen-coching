@@ -1,0 +1,349 @@
+/* RYSEN Coaching — Custom CSS */
+/* ─── Blog / Article Prose ──────────────────── */
+.prose-rysen { color: #333; line-height: 1.8; font-size: 1.0625rem; }
+.prose-rysen h1, .prose-rysen h2, .prose-rysen h3, .prose-rysen h4 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  color: #111;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.prose-rysen h2 { font-size: 1.6rem; }
+.prose-rysen h3 { font-size: 1.25rem; }
+.prose-rysen p { margin-bottom: 1.25em; }
+.prose-rysen ul, .prose-rysen ol { padding-left: 1.5em; margin-bottom: 1.25em; }
+.prose-rysen li { margin-bottom: 0.4em; }
+.prose-rysen blockquote {
+  border-left: 3px solid #F97316;
+  padding: 0.75em 1.25em;
+  margin: 1.5em 0;
+  background: #FFF8F5;
+  border-radius: 0 12px 12px 0;
+  color: #444;
+  font-style: italic;
+}
+.prose-rysen a { color: #F97316; text-decoration: underline; text-underline-offset: 3px; }
+.prose-rysen a:hover { color: #EA6009; }
+.prose-rysen strong { color: #111; font-weight: 700; }
+.prose-rysen em { font-style: italic; }
+.prose-rysen img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 1.5em 0;
+  display: block;
+}
+.prose-rysen code {
+  background: #F3F4F6;
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+  font-size: 0.9em;
+  font-family: monospace;
+}
+.prose-rysen pre {
+  background: #1a1a1a;
+  color: #f8f8f2;
+  padding: 1.25em;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+.prose-rysen hr { border: none; border-top: 1px solid #E5E0D8; margin: 2em 0; }
+
+/* ─── Design Tokens ─────────────────────────── */
+:root {
+  --bg: #FAF8F5;
+  --text-primary: #111111;
+  --text-muted: #6B6B6B;
+  --orange: #F97316;
+  --orange-dark: #EA6009;
+  --dark-bg: #0D0D0D;
+  --white: #FFFFFF;
+  --border: #E5E0D8;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FAF8F5;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Typography ────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: normal;
+  letter-spacing: -0.02em;
+}
+
+body, p, span, a, button, input, textarea, label {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ─── Orange Rule Divider ───────────────────── */
+.gold-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--orange) 20%, var(--orange) 80%, transparent);
+  margin: 2rem 0;
+  opacity: 0.35;
+}
+
+/* ─── Scroll Animations ─────────────────────── */
+.fade-in {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in:nth-child(2) { transition-delay: 0.1s; }
+.fade-in:nth-child(3) { transition-delay: 0.2s; }
+.fade-in:nth-child(4) { transition-delay: 0.3s; }
+
+/* ─── Nav ───────────────────────────────────── */
+#site-nav {
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.4s ease,
+              border-color 0.4s ease,
+              box-shadow 0.4s ease;
+}
+
+/* Transparent state — used on full-bleed hero pages */
+#site-nav.nav-transparent {
+  background-color: transparent !important;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+
+#site-nav.nav-transparent .nav-link {
+  color: rgba(255,255,255,0.85) !important;
+}
+
+
+#site-nav.nav-transparent .nav-link:hover {
+  color: var(--orange) !important;
+}
+
+#site-nav.nav-transparent .hamburger-line {
+  background: white;
+}
+
+#site-nav.scrolled {
+  background-color: var(--bg) !important;
+  border-bottom-color: var(--border);
+  box-shadow: 0 1px 24px rgba(0,0,0,0.07);
+}
+
+/* ─── Mobile Menu ───────────────────────────── */
+#mobile-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#mobile-menu.open {
+  max-height: 500px;
+}
+
+#mobile-menu-btn.active .hamburger-line:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+#mobile-menu-btn.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+#mobile-menu-btn.active .hamburger-line:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+  width: 24px;
+}
+
+/* ─── Hero full-bleed ───────────────────────── */
+.hero-fullbleed {
+  min-height: 100svh;
+}
+
+/* ─── Social cards ──────────────────────────── */
+.social-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.social-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ─── Media logos ───────────────────────────── */
+.media-logo {
+  max-width: 120px;
+}
+
+/* ─── Form inputs ───────────────────────────── */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+
+/* ─── FAQ ───────────────────────────────────── */
+.faq-icon {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Selection colour ──────────────────────── */
+::selection {
+  background-color: var(--orange);
+  color: white;
+}
+
+/* ─── Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* ─── Reduced motion ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Print ─────────────────────────────────── */
+@media print {
+  #site-nav, footer { display: none; }
+}
+
+/* ════════════════════════════════════════════════
+   WARM & ROUNDED THEME — global soft feel
+   ════════════════════════════════════════════════ */
+
+/* ─── Nav logo swap ─────────────────────────── */
+/* Default (light bg): show dark logo, hide white */
+.nav-logo-white { display: none; }
+.nav-logo-dark  { display: block; }
+
+/* Transparent state (dark/hero bg): show white logo */
+#site-nav.nav-transparent .nav-logo-dark  { display: none; }
+#site-nav.nav-transparent .nav-logo-white { display: block; }
+
+/* ─── Global rounded buttons ────────────────── */
+/* Matches all CTA anchors & buttons that use any py-* padding class */
+a[class~="py-2"],   a[class~="py-2.5"], a[class~="py-3"],   a[class~="py-3.5"],
+a[class~="py-4"],   a[class~="py-5"],   a[class~="py-6"],
+button[class~="py-2"], button[class~="py-2.5"], button[class~="py-3"], button[class~="py-3.5"],
+button[class~="py-4"], button[class~="py-5"],   button[class~="py-6"] {
+  border-radius: 50px !important;
+}
+
+/* ─── Rounded article cards ─────────────────── */
+article {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ─── Service cards ──────────────────────────── */
+.service-card {
+  border-radius: 20px !important;
+}
+
+/* ─── Global soft containers ─────────────────── */
+/* Any div/section that has a visible border gets subtle rounding */
+div.border,
+div.border-2,
+div[class~="border-border"],
+div[class~="border-gold"],
+div[class~="border-white\/8"],
+div[class~="border-white\/20"] {
+  border-radius: 0px;
+}
+
+/* ─── Instagram grid — no image rounding ────── */
+.instagram-grid img {
+  border-radius: 0 !important;
+}
+
+/* ─── Article card images — no rounding ─────── */
+article img {
+  border-radius: 0 !important;
+  margin: 0;
+}
+
+/* ─── Preserve explicit rounded-xl on bordered divs ── */
+div[class~="rounded-xl"] {
+  border-radius: 0.75rem !important;
+}
+
+div[class~="rounded-2xl"] {
+  border-radius: 1rem !important;
+}
+
+/* ─── Rounded testimonial cards ─────────────── */
+.testimonial-card {
+  border-radius: 20px !important;
+}
+
+/* ─── Rounded form inputs ───────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+  border-radius: 10px;
+}
+
+/* ─── Global image rounding ─────────────────── */
+/* Tailwind rounded-* classes (rounded-full, rounded-2xl, etc.) override this
+   via higher specificity, so explicitly-rounded images are unaffected.       */
+img {
+  border-radius: 12px;
+}
+
+/* ─── Warm card hover shadow ─────────────────── */
+.hover\:shadow-md:hover {
+  box-shadow: 0 8px 30px rgba(249, 115, 22, 0.08), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ─── Rounded credential / tag pills ────────── */
+span[class*="border border-border"][class*="text-xs"],
+span[class*="border border-white/20"][class*="text-xs"] {
+  border-radius: 50px;
+}
+
+/* ─── Rounded social card ───────────────────── */
+.social-card {
+  border-radius: 20px;
+}
+
+/* ─── Rounded journey step cards ────────────── */
+.grid .fade-in[class*="p-8"] {
+  border-radius: 0;
+}
+

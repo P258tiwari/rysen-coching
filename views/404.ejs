@@ -1,0 +1,20 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main class="min-h-[70vh] flex items-center justify-center py-32 px-6">
+  <div class="text-center max-w-lg">
+    <p class="font-serif text-8xl font-bold text-gold/20 mb-4">404</p>
+    <h1 class="font-serif text-3xl font-bold text-text-primary mb-4">Page not found</h1>
+    <p class="text-text-muted mb-8">The page you're looking for doesn't exist, or may have moved.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="/" class="px-6 py-3 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gold transition-colors">
+        Back to Home
+      </a>
+      <a href="/resources" class="px-6 py-3 border border-border text-text-muted text-sm font-semibold rounded-full hover:border-gold hover:text-gold transition-colors">
+        Browse Resources
+      </a>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

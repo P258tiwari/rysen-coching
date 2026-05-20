@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= article ? 'Edit Article' : 'New Article' %> | RYSEN Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#F8F7F4',
+            gold: '#F97316',
+            'dark-bg': '#0D0D0D',
+            border: '#E5E0D8'
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Quill Snow theme -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #F97316 !important; }
+
+    /* Quill editor sizing */
+    #editor { min-height: 420px; font-size: 15px; line-height: 1.7; }
+    .ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: #E5E0D8 !important; background: #F8F7F4; }
+    .ql-container { border-radius: 0 0 12px 12px !important; border-color: #E5E0D8 !important; }
+    .ql-editor { min-height: 420px; }
+    .ql-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; }
+    .ql-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; }
+    .ql-editor h3 { font-size: 1.25em; font-weight: bold; margin: 0.5em 0; }
+    .ql-editor img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+    .ql-editor p { margin-bottom: 0.75em; }
+    .ql-editor ul, .ql-editor ol { padding-left: 1.5em; margin-bottom: 0.75em; }
+
+    /* char counter */
+    #seo-desc-count { font-size: 11px; }
+    .count-warn { color: #ef4444; }
+    .count-ok { color: #6B6B6B; }
+
+    /* Upload overlay */
+    #upload-spinner { display: none; }
+    #upload-spinner.active { display: flex; }
+  </style>
+</head>
+<body class="min-h-screen bg-bg">
+
+  <!-- Top bar -->
+  <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-lg font-black tracking-[0.2em]">RYSEN</a>
+      <span class="text-gray-600 text-sm">/ <a href="/admin/dashboard" class="hover:text-white transition-colors">Articles</a> / <%= article ? 'Edit' : 'New' %></span>
+    </div>
+    <a href="/admin/logout" class="text-xs text-gray-400 hover:text-red-400 transition-colors">Sign out</a>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-10">
+
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-2xl font-bold text-gray-900"><%= article ? 'Edit Article' : 'New Article' %></h1>
+      <a href="/admin/dashboard" class="text-sm text-gray-400 hover:text-gray-700 transition-colors">← Back to dashboard</a>
+    </div>
+
+    <% if (error) { %>
+      <div class="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form id="article-form" method="POST" action="<%= action %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <!-- Hidden content field populated by Quill before submit -->
+      <input type="hidden" name="content" id="content-input">
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ── Left: Main content ── -->
+        <div class="lg:col-span-2 space-y-5">
+
+          <!-- Title -->
+          <div class="bg-white rounded-2xl border border-border p-6">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Title *</label>
+            <input
+              type="text"
+              name="title"
+              required
+              value="<%= article ? article.title : '' %>"
+              placeholder="Article title…"
+              class="w-full px-4 py-3 border border-border rounded-xl text-base font-semibold text-gray-900 bg-bg transition-colors"
+            >
+          </div>
+
+          <!-- Excerpt -->
+          <div class="bg-white rounded-2xl border border-border p-6">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Excerpt</label>
+            <textarea
+              name="excerpt"
+              rows="3"
+              placeholder="Short summary shown on listing pages…"
+              class="w-full px-4 py-3 border border-border rounded-xl text-sm text-gray-700 bg-bg resize-none transition-colors leading-relaxed"
+            ><%= article ? article.excerpt : '' %></textarea>
+          </div>
+
+          <!-- Rich text content -->
+          <div class="bg-white rounded-2xl border border-border p-6">
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Content *</label>
+              <!-- Inline image upload button -->
+              <label for="inline-image-upload"
+                class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-gold transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Upload image
+              </label>
+              <input type="file" id="inline-image-upload" accept="image/*" class="hidden">
+            </div>
+            <!-- Quill editor mount -->
+            <div id="editor"><%- article ? article.content : '' %></div>
+          </div>
+
+        </div>
+
+        <!-- ── Right: Sidebar ── -->
+        <div class="space-y-5">
+
+          <!-- Publish settings -->
+          <div class="bg-white rounded-2xl border border-border p-6">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Publish</h3>
+
+            <label class="flex items-center gap-3 cursor-pointer mb-5">
+              <div class="relative">
+                <input type="checkbox" name="published" id="published-toggle" class="sr-only"
+                  <%= article && article.published ? 'checked' : '' %>>
+                <div class="toggle-bg w-11 h-6 bg-gray-200 rounded-full transition-colors duration-200"></div>
+                <div class="toggle-dot absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"></div>
+              </div>
+              <span class="text-sm font-medium text-gray-700" id="publish-label">
+                <%= article && article.published ? 'Published' : 'Draft' %>
+              </span>
+            </label>
+
+            <button type="submit"
+              class="w-full py-3 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gold transition-colors duration-300">
+              <%= article ? 'Save Changes' : 'Publish Article' %>
+            </button>
+          </div>
+
+          <!-- Category + Read time -->
+          <div class="bg-white rounded-2xl border border-border p-6 space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Category</label>
+              <select id="category-select" name="category"
+                class="w-full px-4 py-3 border border-border rounded-xl text-sm text-gray-700 bg-bg transition-colors">
+                <% categories.forEach(function(cat) { %>
+                  <option value="<%= cat %>" <%= article && article.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }); %>
+                <option value="__new__">+ Create new category…</option>
+              </select>
+              <!-- Shown when "Create new" is selected -->
+              <div id="new-cat-wrap" class="hidden mt-2 flex gap-2">
+                <input type="text" id="new-category-input" name="new_category"
+                  placeholder="e.g. Personal Growth"
+                  class="flex-1 px-4 py-3 border border-gold rounded-xl text-sm text-gray-700 bg-bg outline-none focus:ring-2 focus:ring-gold/30">
+                <button type="button" id="cancel-new-cat"
+                  class="px-3 py-2 text-xs text-gray-400 hover:text-gray-700 border border-border rounded-xl transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Read Time (minutes)</label>
+              <input type="number" name="readTime" min="1" max="60"
+                value="<%= article ? article.readTime : '5' %>"
+                class="w-full px-4 py-3 border border-border rounded-xl text-sm text-gray-700 bg-bg transition-colors">
+            </div>
+          </div>
+
+          <!-- Featured image -->
+          <div class="bg-white rounded-2xl border border-border p-6">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Featured Image</h3>
+            <div class="mb-3">
+              <label class="flex items-center justify-center gap-2 cursor-pointer w-full py-3 border-2 border-dashed border-border rounded-xl hover:border-gold transition-colors text-sm text-gray-400">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Upload from computer
+                <input type="file" id="featured-image-upload" accept="image/*" class="hidden">
+              </label>
+            </div>
+            <p class="text-xs text-gray-400 mb-2">— or paste URL below —</p>
+            <input type="text" name="featuredImage" id="featuredImageUrl"
+              value="<%= article ? article.featuredImage : '' %>"
+              placeholder="https://…"
+              class="w-full px-4 py-3 border border-border rounded-xl text-xs text-gray-500 bg-bg transition-colors">
+            <% if (article && article.featuredImage) { %>
+              <img id="feat-preview" src="<%= article.featuredImage %>" class="mt-3 w-full aspect-video object-cover rounded-xl">
+            <% } else { %>
+              <img id="feat-preview" src="" class="mt-3 w-full aspect-video object-cover rounded-xl hidden">
+            <% } %>
+          </div>
+
+          <!-- SEO -->
+          <div class="bg-white rounded-2xl border border-border p-6 space-y-4">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">SEO</h3>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">SEO Title <span class="text-gray-300">(≤60 chars)</span></label>
+              <input type="text" name="seoTitle" maxlength="70"
+                value="<%= article ? article.seoTitle : '' %>"
+                placeholder="Same as title if blank"
+                class="w-full px-4 py-2.5 border border-border rounded-xl text-xs text-gray-700 bg-bg transition-colors">
+            </div>
+            <div>
+              <div class="flex justify-between mb-1.5">
+                <label class="text-xs text-gray-500">Meta Description <span class="text-gray-300">(≤160 chars)</span></label>
+                <span id="seo-desc-count" class="count-ok">0 / 160</span>
+              </div>
+              <textarea name="seoDescription" id="seoDescription" rows="3" maxlength="160"
+                placeholder="Compelling sentence for search engines…"
+                class="w-full px-4 py-2.5 border border-border rounded-xl text-xs text-gray-700 bg-bg resize-none transition-colors leading-relaxed"
+              ><%= article ? article.seoDescription : '' %></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">OG Image URL</label>
+              <input type="text" name="ogImage"
+                value="<%= article ? article.ogImage : '' %>"
+                placeholder="Defaults to featured image"
+                class="w-full px-4 py-2.5 border border-border rounded-xl text-xs text-gray-500 bg-bg transition-colors">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script>
+    // ─── Quill setup ───────────────────────────────────────────────────────────
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: {
+          container: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            ['link', 'image'],
+            [{ align: [] }],
+            ['clean']
+          ],
+          handlers: { image: imageUploadHandler }
+        }
+      }
+    });
+
+    // ─── Image upload via toolbar ─────────────────────────────────────────────
+    function imageUploadHandler() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.click();
+      input.onchange = () => uploadImageFile(input.files[0], (url) => {
+        const range = quill.getSelection(true);
+        quill.insertEmbed(range.index, 'image', url);
+        quill.setSelection(range.index + 1);
+      });
+    }
+
+    // ─── Inline upload button (above editor) ─────────────────────────────────
+    document.getElementById('inline-image-upload').addEventListener('change', function() {
+      if (!this.files[0]) return;
+      uploadImageFile(this.files[0], (url) => {
+        const range = quill.getSelection(true) || { index: quill.getLength() };
+        quill.insertEmbed(range.index, 'image', url);
+        quill.setSelection(range.index + 1);
+      });
+      this.value = '';
+    });
+
+    async function uploadImageFile(file, callback) {
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('image', file);
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.url) callback(data.url);
+        else alert('Upload failed: ' + (data.error || 'Unknown error'));
+      } catch (e) {
+        alert('Upload error: ' + e.message);
+      }
+    }
+
+    // ─── Featured image upload ────────────────────────────────────────────────
+    document.getElementById('featured-image-upload').addEventListener('change', function() {
+      if (!this.files[0]) return;
+      uploadImageFile(this.files[0], (url) => {
+        document.getElementById('featuredImageUrl').value = url;
+        const preview = document.getElementById('feat-preview');
+        preview.src = url;
+        preview.classList.remove('hidden');
+      });
+      this.value = '';
+    });
+
+    // Featured image URL preview
+    document.getElementById('featuredImageUrl').addEventListener('input', function() {
+      const preview = document.getElementById('feat-preview');
+      if (this.value) { preview.src = this.value; preview.classList.remove('hidden'); }
+      else { preview.classList.add('hidden'); }
+    });
+
+    // ─── SEO description counter ──────────────────────────────────────────────
+    const seoDesc = document.getElementById('seoDescription');
+    const seoCount = document.getElementById('seo-desc-count');
+    function updateCount() {
+      const len = seoDesc.value.length;
+      seoCount.textContent = `${len} / 160`;
+      seoCount.className = len > 160 ? 'count-warn' : 'count-ok';
+    }
+    seoDesc.addEventListener('input', updateCount);
+    updateCount();
+
+    // ─── Published toggle ─────────────────────────────────────────────────────
+    const toggle = document.getElementById('published-toggle');
+    const toggleBg = toggle.nextElementSibling;
+    const toggleDot = toggle.nextElementSibling.nextElementSibling;
+    const publishLabel = document.getElementById('publish-label');
+
+    function syncToggle() {
+      if (toggle.checked) {
+        toggleBg.style.backgroundColor = '#F97316';
+        toggleDot.style.transform = 'translateX(20px)';
+        publishLabel.textContent = 'Published';
+      } else {
+        toggleBg.style.backgroundColor = '#D1D5DB';
+        toggleDot.style.transform = 'translateX(0)';
+        publishLabel.textContent = 'Draft';
+      }
+    }
+    toggle.addEventListener('change', syncToggle);
+    syncToggle();
+
+    // ─── Category: create new ────────────────────────────────────────────────
+    const catSelect   = document.getElementById('category-select');
+    const newCatWrap  = document.getElementById('new-cat-wrap');
+    const newCatInput = document.getElementById('new-category-input');
+    const cancelBtn   = document.getElementById('cancel-new-cat');
+
+    catSelect.addEventListener('change', function() {
+      if (this.value === '__new__') {
+        newCatWrap.classList.remove('hidden');
+        newCatInput.focus();
+      } else {
+        newCatWrap.classList.add('hidden');
+        newCatInput.value = '';
+      }
+    });
+
+    cancelBtn.addEventListener('click', function() {
+      catSelect.value = catSelect.options[0].value;
+      newCatWrap.classList.add('hidden');
+      newCatInput.value = '';
+    });
+
+    // ─── Inject Quill HTML before submit ─────────────────────────────────────
+    document.getElementById('article-form').addEventListener('submit', function(e) {
+      if (catSelect.value === '__new__' && !newCatInput.value.trim()) {
+        e.preventDefault();
+        newCatInput.focus();
+        newCatInput.classList.add('ring-2', 'ring-red-400');
+        return;
+      }
+      document.getElementById('content-input').value = quill.root.innerHTML;
+    });
+  </script>
+</body>
+</html>

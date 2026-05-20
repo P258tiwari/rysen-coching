@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RYSEN Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#F8F7F4',
+            gold: '#F97316',
+            'dark-bg': '#0D0D0D',
+            border: '#E5E0D8'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-bg">
+
+  <!-- Top bar -->
+  <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-lg font-black tracking-[0.2em]">RYSEN</a>
+      <span class="text-gray-600 text-sm">/ Admin</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="/" target="_blank" class="text-xs text-gray-400 hover:text-white transition-colors">View Site ↗</a>
+      <a href="/admin/logout" class="text-xs text-gray-400 hover:text-red-400 transition-colors">Sign out</a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+
+    <!-- Page header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Articles</h1>
+        <p class="text-sm text-gray-400 mt-1"><%= articles.length %> total</p>
+      </div>
+      <a href="/admin/new"
+        class="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gold transition-colors duration-300">
+        + New Article
+      </a>
+    </div>
+
+    <% if (message) { %>
+      <div class="mb-6 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+        <%= message %>
+      </div>
+    <% } %>
+
+    <% if (articles.length === 0) { %>
+      <div class="bg-white rounded-2xl border border-border p-16 text-center">
+        <p class="text-gray-400 text-sm mb-4">No articles yet.</p>
+        <a href="/admin/new" class="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gold transition-colors">
+          Create your first article
+        </a>
+      </div>
+    <% } else { %>
+
+      <!-- Table -->
+      <div class="bg-white rounded-2xl border border-border overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-border bg-bg">
+              <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</th>
+              <th class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
+              <th class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
+              <th class="text-center px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            <% articles.forEach(function(article) { %>
+              <tr class="hover:bg-bg transition-colors">
+                <td class="px-6 py-4">
+                  <div>
+                    <p class="font-semibold text-gray-900 leading-snug line-clamp-1"><%= article.title %></p>
+                    <p class="text-xs text-gray-400 mt-0.5">/blog/<%= article.slug %></p>
+                  </div>
+                </td>
+                <td class="px-4 py-4 hidden md:table-cell">
+                  <span class="px-2.5 py-1 bg-orange-50 text-orange-600 text-xs font-medium rounded-full border border-orange-200">
+                    <%= article.category %>
+                  </span>
+                </td>
+                <td class="px-4 py-4 text-xs text-gray-400 hidden lg:table-cell">
+                  <%= new Date(article.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <% if (article.published) { %>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-200">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Published
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full border border-gray-200">
+                      <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Draft
+                    </span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <a href="/blog/<%= article.slug %>" target="_blank"
+                      class="px-3 py-1.5 text-xs text-gray-500 border border-border rounded-full hover:border-gray-400 transition-colors">
+                      View
+                    </a>
+                    <a href="/admin/edit/<%= article.id %>"
+                      class="px-3 py-1.5 text-xs text-gray-900 border border-gray-900 rounded-full hover:bg-gray-900 hover:text-white transition-colors">
+                      Edit
+                    </a>
+                    <form method="POST" action="/admin/delete/<%= article.id %>"
+                      onsubmit="return confirm('Delete \'<%= article.title.replace(/'/g, '\\\'') %>\'? This cannot be undone.')">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit"
+                        class="px-3 py-1.5 text-xs text-red-500 border border-red-200 rounded-full hover:bg-red-50 transition-colors">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+    <% } %>
+  </main>
+
+</body>
+</html>

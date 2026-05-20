@@ -1,0 +1,34 @@
+# Environment variables — never commit
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# User uploaded content
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Data files — articles and subscribers are runtime data
+data/articles.json
+data/categories.json
+data/subscribers.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime
+*.pid

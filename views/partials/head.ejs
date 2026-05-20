@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title><%= title %></title>
+  <meta name="description" content="<%= description %>">
+  <link rel="canonical" href="<%= canonicalUrl %>">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/images/rysen-favicon.svg">
+  <link rel="shortcut icon" href="/images/rysen-favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="<%= title %>">
+  <meta property="og:description" content="<%= description %>">
+  <meta property="og:image" content="<%= ogImage %>">
+  <meta property="og:url" content="<%= canonicalUrl %>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RYSEN Coaching">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@coach_author_bidishabanerjee">
+  <meta name="twitter:title" content="<%= title %>">
+  <meta name="twitter:description" content="<%= description %>">
+  <meta name="twitter:image" content="<%= ogImage %>">
+
+  <!-- Additional SEO -->
+  <meta name="author" content="Bidisha Banerjee">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#F97316">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#FAF8F5',
+            'text-primary': '#111111',
+            'text-muted': '#6B6B6B',
+            gold: '#F97316',
+            'dark-bg': '#0D0D0D',
+            white: '#FFFFFF',
+            border: '#E5E0D8'
+          },
+          fontFamily: {
+            serif: ['Arial', 'Helvetica', 'sans-serif'],
+            sans: ['Arial', 'Helvetica', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/custom.css">
+
+  <% if (page === 'home') { %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "RYSEN Coaching",
+        "url": "<%= canonicalUrl %>",
+        "description": "<%= description %>"
+      },
+      {
+        "@type": "Person",
+        "name": "Bidisha Banerjee",
+        "jobTitle": "ICF PCC Executive Coach & Author",
+        "url": "<%= canonicalUrl %>/about",
+        "image": "<%= ogImage %>",
+        "sameAs": [
+          "https://www.linkedin.com/in/bidisha-banerjee",
+          "https://www.instagram.com/coach_author_bidishabanerjee",
+          "https://topmate.io/bidisha_banerjee"
+        ]
+      }
+    ]
+  }
+  </script>
+  <% } %>
+
+  <% if (typeof article !== 'undefined' && article) { %>
+  <!-- Blog post specific meta -->
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="<%= article.createdAt %>">
+  <meta property="article:modified_time" content="<%= article.updatedAt %>">
+  <meta property="article:author" content="Bidisha Banerjee">
+  <meta property="article:section" content="<%= article.category %>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "<%- article.title.replace(/"/g, '\\"') %>",
+    "description": "<%- (article.seoDescription || article.excerpt || '').replace(/"/g, '\\"') %>",
+    "image": "<%= article.ogImage || article.featuredImage || ogImage %>",
+    "url": "<%= canonicalUrl %>",
+    "datePublished": "<%= article.createdAt %>",
+    "dateModified": "<%= article.updatedAt %>",
+    "author": {
+      "@type": "Person",
+      "name": "Bidisha Banerjee",
+      "url": "<%= typeof siteUrl !== 'undefined' ? siteUrl : '' %>/about",
+      "sameAs": ["https://www.linkedin.com/in/bidisha-banerjee"]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "RYSEN Coaching",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "<%= typeof siteUrl !== 'undefined' ? siteUrl : '' %>/images/rysen-logo.svg"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "<%= canonicalUrl %>"
+    },
+    "articleSection": "<%= article.category %>",
+    "wordCount": <%- Math.round((article.content || '').replace(/<[^>]+>/g, '').split(/\s+/).length) %>
+  }
+  </script>
+  <% } %>
+
+  <% if (page === 'about') { %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Bidisha Banerjee",
+    "jobTitle": "Executive Coach",
+    "description": "ICF PCC-Certified Executive Coach with 25+ years of experience as CHRO and CLO",
+    "url": "<%= canonicalUrl %>",
+    "image": "<%= ogImage %>",
+    "sameAs": [
+      "https://www.linkedin.com/in/bidisha-banerjee",
+      "https://topmate.io/bidisha_banerjee"
+    ],
+    "knowsAbout": ["Executive Coaching", "Leadership Development", "Career Transitions", "Executive Presence"],
+    "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "ICF PCC Certification"
+    }
+  }
+  </script>
+  <% } %>
+
+  <% if (page === 'services') { %>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "RYSEN Executive Coaching Programs",
+    "provider": {
+      "@type": "Person",
+      "name": "Bidisha Banerjee"
+    },
+    "description": "<%= description %>",
+    "url": "<%= canonicalUrl %>",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Discovery Session",
+        "price": "12000",
+        "priceCurrency": "INR",
+        "description": "60-minute initial coaching session"
+      },
+      {
+        "@type": "Offer",
+        "name": "The Clarity Sprint",
+        "price": "40000",
+        "priceCurrency": "INR",
+        "description": "3-session coaching programme"
+      },
+      {
+        "@type": "Offer",
+        "name": "The Breakthrough Programme",
+        "price": "120000",
+        "priceCurrency": "INR",
+        "description": "6-session transformation programme"
+      },
+      {
+        "@type": "Offer",
+        "name": "Rise to Your Next Level",
+        "price": "250000",
+        "priceCurrency": "INR",
+        "description": "10-session flagship coaching programme"
+      }
+    ]
+  }
+  </script>
+  <% } %>
+</head>
+<body class="bg-bg text-text-primary font-sans antialiased">

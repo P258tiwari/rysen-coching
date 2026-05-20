@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:\\\\@File\\\\Ampwake\\\\Devlopment\\\\rise-coching\" && mkdir -p views/partials public/css public/js)",
+      "PowerShell(Get-ChildItem \"c:\\\\@File\\\\Ampwake\\\\Devlopment\\\\rise-coching\\\\public\" -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Start-Sleep -Seconds 2; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000\" -TimeoutSec 5; \"Status: $\\($r.StatusCode\\)\" } catch { \"Error: $_\" })"
+    ],
+    "additionalDirectories": [
+      "c:\\@File\\Ampwake\\Devlopment\\rise-coching\\views"
+    ]
+  }
+}
