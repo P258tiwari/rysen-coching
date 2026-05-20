@@ -32,29 +32,13 @@
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#F97316">
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            bg: '#FAF8F5',
-            'text-primary': '#111111',
-            'text-muted': '#6B6B6B',
-            gold: '#F97316',
-            'dark-bg': '#0D0D0D',
-            white: '#FFFFFF',
-            border: '#E5E0D8'
-          },
-          fontFamily: {
-            serif: ['Arial', 'Helvetica', 'sans-serif'],
-            sans: ['Arial', 'Helvetica', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Preload hero image on home page for fast LCP -->
+  <% if (page === 'home') { %>
+  <link rel="preload" as="image" href="/images/bidisha-book-speach.png" fetchpriority="high">
+  <% } %>
+
+  <!-- Tailwind CSS (pre-built, purged) -->
+  <link rel="stylesheet" href="/css/tailwind.css">
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/css/custom.css">

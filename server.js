@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const compression = require('compression');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
@@ -28,20 +29,28 @@ if (process.env.NODE_ENV === 'production') {
 if (!fs.existsSync(DATA_FILE))        fs.writeFileSync(DATA_FILE,        JSON.stringify({ articles: [] }, null, 2));
 if (!fs.existsSync(CATEGORIES_FILE))  fs.writeFileSync(CATEGORIES_FILE,  JSON.stringify(DEFAULT_CATEGORIES, null, 2));
 
-// ─── Article helpers ──────────────────────────────────────────────────────────
+// ─── In-memory cache (invalidated on every write) ────────────────────────────
+let _articlesCache = null;
+let _categoriesCache = null;
+
 function readArticles() {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')).articles || []; }
-  catch { return []; }
+  if (_articlesCache) return _articlesCache;
+  try { _articlesCache = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')).articles || []; }
+  catch { _articlesCache = []; }
+  return _articlesCache;
 }
 
 function writeArticles(articles) {
   fs.writeFileSync(DATA_FILE, JSON.stringify({ articles }, null, 2));
+  _articlesCache = articles;
 }
 
 // ─── Category helpers ─────────────────────────────────────────────────────────
 function readCategories() {
-  try { return JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf8')); }
-  catch { return [...DEFAULT_CATEGORIES]; }
+  if (_categoriesCache) return _categoriesCache;
+  try { _categoriesCache = JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf8')); }
+  catch { _categoriesCache = [...DEFAULT_CATEGORIES]; }
+  return _categoriesCache;
 }
 
 function resolveCategory(body) {
@@ -52,6 +61,7 @@ function resolveCategory(body) {
       if (!cats.includes(cat)) {
         cats.push(cat);
         fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(cats, null, 2));
+        _categoriesCache = cats;
       }
       return cat;
     }
@@ -149,7 +159,12 @@ const upload = multer({
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(compression());
+// Immutable assets (hashed filenames) get 1-year cache; everything else 1 day
+app.use('/css', express.static(path.join(__dirname, 'public', 'css'), { maxAge: '7d' }));
+app.use('/js', express.static(path.join(__dirname, 'public', 'js'), { maxAge: '7d' }));
+app.use('/images', express.static(path.join(__dirname, 'public', 'images'), { maxAge: '30d' }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
