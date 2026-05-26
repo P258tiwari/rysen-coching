@@ -334,6 +334,12 @@ img[src*="rysen-favicon"] {
   border-radius: 0 !important;
 }
 
+/* ─── Hero background image — no rounding ───── */
+.hero-fullbleed img,
+.hero-fullbleed picture img {
+  border-radius: 0 !important;
+}
+
 /* ─── Warm card hover shadow ─────────────────── */
 .hover\:shadow-md:hover {
   box-shadow: 0 8px 30px rgba(249, 115, 22, 0.08), 0 2px 8px rgba(0,0,0,0.06);
