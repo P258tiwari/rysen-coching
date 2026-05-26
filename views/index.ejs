@@ -8,11 +8,14 @@
 
     <!-- Background image -->
     <div class="absolute inset-0 bg-dark-bg">
-      <img
-        src="/images/bidisha-hero-v2.png?v=3"
-        alt="Bidisha Banerjee — Executive Coach"
-        fetchpriority="high"
-        class="w-full h-full object-cover object-center">
+      <picture>
+        <source media="(max-width: 768px)" srcset="/images/bidisha-hero-moible.png?v=1">
+        <img
+          src="/images/bidisha-hero-v2.png?v=3"
+          alt="Bidisha Banerjee — Executive Coach"
+          fetchpriority="high"
+          class="w-full h-full object-cover object-center">
+      </picture>
       <!-- Left-to-right gradient: dark left where text sits, fades to photo -->
       <div class="absolute inset-0" style="background: linear-gradient(105deg, rgba(10,10,10,0.97) 0%, rgba(10,10,10,0.88) 38%, rgba(10,10,10,0.55) 58%, rgba(10,10,10,0.1) 78%, rgba(10,10,10,0) 92%)"></div>
       <!-- Bottom vignette for continuity with next section -->
